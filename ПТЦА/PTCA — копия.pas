@@ -22,29 +22,41 @@ begin
   Pen.Width := 1;
 end;
 
-
+procedure Lighting();
+begin
+  Pen.Color := rgb(0, 255, 0);
+  Pen.Width := 4;
+  for i: byte := 0 to 7 do 
+  begin
+    if (Kx + dx[i] < 8) and (Kx + dx[i] >= 0) and 
+         (Ky + dy[i] < 8) and (Ky + dy[i] >= 0) then
+      if mas[Kx + dx[i], Ky + dy[i]] = 0 then
+        DrawEllipse((Kx + dx[i]) * 50 + 5, (Ky + dy[i]) * 50 + 5, 
+        (Kx + dx[i] + 1) * 50 - 5, (Ky + dy[i] + 1) * 50 - 5);
+  end;
+  Pen.Color := clBlack;
+  Pen.Width := 1;
+end;
 
 procedure Redraw();
-var
-  i, j: integer;
 begin
   ClearWindow();
   Pen.Color := clBlack;
-  for i := 0 to 7 do
-    for j := 0 to 7 do 
+  for i: byte := 0 to 7 do
+    for j: byte := 0 to 7 do 
     begin
-      if ((i + j) mod 2 = 0) then
+      if ((i + j) mod 2 = 1) then
         Brush.Color := clGray
       else
         Brush.Color := clWhite;
       FillRect(i * 50, j * 50, (i + 1) * 50, (j + 1) * 50);
     end;
   Font.Size := 16;
-  for i := 0 to 7 do
-    for j := 0 to 7 do 
+  for i: byte := 0 to 7 do
+    for j: byte := 0 to 7 do 
     begin
       if mas[i, j] > 0 then begin
-        if ((i + j) mod 2 = 0) then
+        if ((i + j) mod 2 = 1) then
           Brush.Color := clGray
         else
           Brush.Color := clWhite;
@@ -59,47 +71,46 @@ begin
   Brush.Color := clWhite;
   textout(450, 50, 'Количество: ');
   textout(450, 100, count);
+  for i: byte := 0 to 7 do
+    textout(i * 50 + 19, 405, chr(ord('a') + i));
+  for i: byte := 0 to 7 do
+    textout(405, i * 50 + 14, 8 - i);
 end;
 
 procedure CheckWin();
-var
-  i: integer;
 begin
-  if (Kx = 0) and (Ky = 0) and (count = 63) then begin 
+  if (Kx = 0) and (Ky = 7) and (count = 63) then begin
     Brush.Color := clwhite;
-    textout(100, 200, 'Ты выиграл, нажми на надпись чтобы сыграть еще раз');
+    textout(100, 200, 'Ты выиграл, нажми, чтобы сыграть еще раз');
     win1 := true;
   end;
 end;
 
 procedure CheckLose();
 var
-  c: integer;
-  i: integer;
+  c: byte;
 begin
   if not win1 then begin
     c := 0;
-    for i := 0 to 7 do
+    for i: byte := 0 to 7 do
       if (Kx + dx[i] < 8) and (Kx + dx[i] >= 0) and 
          (Ky + dy[i] < 8) and (Ky + dy[i] >= 0) then
-    if mas[Kx + dx[i], Ky + dy[i]] = 0 then
-      inc(c);
+        if mas[Kx + dx[i], Ky + dy[i]] = 0 then
+          inc(c);
     if c = 0 then begin
       Brush.Color := clwhite;
-      textout(100, 200, 'Ты проиграл, нажми на надпись чтобы сыграть еще раз');
+      textout(100, 200, 'Ты проиграл, нажми, чтобы сыграть еще раз');
       Lose1 := true;
     end;
   end;
 end;
 
 procedure NewGame();
-var
-  i, j: integer;
 begin
   Pen.Color := clBlack;
   count := 0;
-  for i := 0 to 7 do
-    for j := 0 to 7 do 
+  for i: byte := 0 to 7 do
+    for j: byte := 0 to 7 do 
     begin
       mas[i, j] := 0;
     end;
@@ -109,17 +120,18 @@ begin
   Win1 := false;
   Redraw();
   DrawX(Kx, Ky);
+  Lighting();
 end;
 
 procedure MouseDown(x, y, mb: integer);
 var
-  h, i: integer;
+  h: integer;
 begin
   if lose1 or win1 then
     NewGame()
   else begin
     h := -1;
-    for i := 0 to 7 do
+    for i: byte := 0 to 7 do
       if (x div 50 = Kx + dx[i]) and (y div 50 = Ky + dy[i]) and
         (x < 400) and (y < 400) then
         h := i;
@@ -132,20 +144,13 @@ begin
       DrawX(Kx, Ky);
       CheckWin();
       CheckLose();
+      Lighting();
     end;
   end;
 end;
 
-
-
-
-
-var
-  i: integer;
-  j: integer;
-
 begin
   OnMouseDown := MouseDown;
-  SetWindowSize(600, 400);
+  SetWindowSize(600, 430);
   NewGame();
 end.
