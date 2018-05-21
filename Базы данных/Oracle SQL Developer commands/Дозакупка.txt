@@ -1,0 +1,16 @@
+declare
+C INT := 0;
+begin
+FOR stor_count in (SELECT * FROM STORAGE_PRODUCT) LOOP
+    
+     c := 0;
+    For order_product in (
+        SELECT * from order_product op, "Order" o
+        where o.status = 'Y' and op.order_code = o.order_id
+        and op.storage_product_id = stor_count.storage_product_id)
+    LOOP
+        c := c + order_product.count;
+    END loop;
+END loop;
+
+end;
