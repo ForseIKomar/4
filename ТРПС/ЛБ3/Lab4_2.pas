@@ -7,9 +7,6 @@ program V13;
 
 uses
 Timers;
-
-const
-  Nmax = 10;
   
 var
   x1: integer;
@@ -23,31 +20,32 @@ var
   i, j, k, o, l: word;
   max, n: integer;
   eps, sw, s: real;
-  x, b: array [1..Nmax] of real;
-  a: array [1..Nmax, 1..Nmax] of real;
+  x, b: array of real;
+  a: array of array of real;
 
 begin
   // Ввод n и max
   write('Количество уравнений : ');
   readln(n);
-  if (n > Nmax) then begin
-    writeln('Количество уравнений = 10');
-    n := Nmax;
-  end;
+  SetLength(a, n);
+  SetLength(b, n);
+  SetLength(x, n);
+  for i := 0 to n - 1 do
+    SetLength(a[i], n);
   write('Введите максимальное количество итераций: ');
   readln(max);
   writeln('Введите числа в матрицу и свободные члены: ');
   // Ввод матрицы
   eps := 0.01;
-  for i := 1 to n do
-    for j := 1 to n do 
+  for i := 0 to n - 1 do
+    for j := 0 to n - 1 do 
     begin
-      write('a', i, j, '=');
+      write('a', i + 1, j + 1, '=');
       readln(a[i, j]);
     end;
   writeln;
   // Ввод массива b
-  for i := 1 to n do 
+  for i := 0 to n - 1 do 
   begin
     write('b', i, '=');
     readln(b[i]); 
@@ -57,7 +55,7 @@ begin
   for o := 1 to 20 do
   for l := 1 to 50000 do 
   begin
-    for i := 1 to n do 
+    for i := 0 to n - 1 do 
       x[i] := 0;
     k := 0;
     
@@ -65,10 +63,10 @@ begin
     repeat
       k := k + 1;
       sw := 0;
-      for i := 1 to n do 
+      for i := 0 to n - 1 do 
       begin
         s := b[i];
-        for j := 1 to n do 
+        for j := 0 to n - 1 do 
           s := s - a[i, j] * x[j];
         s := s / a[i, i];
         x[i] := s + x[i];
@@ -78,7 +76,7 @@ begin
   end;
   
   writeln('Time = ', x1*20, 'ms ');
-  for i := 1 to n do 
+  for i := 0 to n - 1 do 
     write('  x[', i, '] = ', x[i]:4:4);
   writeln;
   
